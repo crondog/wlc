@@ -343,6 +343,9 @@ uint32_t wlc_view_get_mask(wlc_handle view);
 /** Set visibility bitmask. */
 void wlc_view_set_mask(wlc_handle view, uint32_t mask);
 
+/** Set alpha. */
+void wlc_view_set_alpha(wlc_handle view, double alpha);
+
 /** Get current geometry. */
 const struct wlc_geometry* wlc_view_get_geometry(wlc_handle view);
 

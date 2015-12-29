@@ -56,6 +56,8 @@ struct wlc_view {
    struct {
       bool created;
    } state;
+
+   double alpha;
 };
 
 WLC_NONULL void wlc_view_update(struct wlc_view *view);
@@ -83,6 +85,7 @@ void wlc_view_send_below_ptr(struct wlc_view *view, struct wlc_view *other);
 void wlc_view_bring_above_ptr(struct wlc_view *view, struct wlc_view *other);
 void wlc_view_bring_to_front_ptr(struct wlc_view *view);
 void wlc_view_set_mask_ptr(struct wlc_view *view, uint32_t mask);
+void wlc_view_set_alpha_ptr(struct wlc_view *view, double alpha);
 WLC_NONULLV(3) void wlc_view_set_geometry_ptr(struct wlc_view *view, uint32_t edges, const struct wlc_geometry *geometry);
 void wlc_view_set_type_ptr(struct wlc_view *view, enum wlc_view_type_bit type, bool toggle);
 void wlc_view_set_state_ptr(struct wlc_view *view, enum wlc_view_state_bit state, bool toggle);

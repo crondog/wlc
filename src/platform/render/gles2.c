@@ -39,6 +39,7 @@ enum {
    UNIFORM_TEXTURE2,
    UNIFORM_RESOLUTION,
    UNIFORM_DIM,
+   UNIFORM_ALPHA,
    UNIFORM_LAST,
 };
 
@@ -54,6 +55,7 @@ static const char *uniform_names[UNIFORM_LAST] = {
    "texture2",
    "resolution",
    "dim",
+   "alpha",
 };
 
 struct ctx {
@@ -78,6 +80,7 @@ struct ctx {
 struct paint {
    struct wlc_geometry visible;
    GLfloat dim;
+   GLfloat alpha;
    enum program_type program;
    bool filter;
 };
@@ -367,10 +370,11 @@ create_context(void)
       "precision mediump float;\n"
       "uniform sampler2D texture0;\n"
       "uniform float dim;\n"
+      "uniform float alpha;\n"
       "varying vec2 v_uv;\n"
       "void main() {\n"
       "  vec4 col = texture2D(texture0, v_uv);\n"
-      "  gl_FragColor = vec4(col.rgb * dim, col.a);\n"
+      "  gl_FragColor = vec4(col.rgb * dim, col.a * alpha);\n"
       "}\n";
 
    const char *frag_shader_egl =
@@ -379,11 +383,12 @@ create_context(void)
       "precision mediump float;\n"
       "uniform samplerExternalOES texture0;\n"
       "uniform float dim;\n"
+      "uniform float alpha;\n"
       "varying vec2 v_uv;\n"
       "void main()\n"
       "{\n"
       "  vec4 col = texture2D(texture0, v_uv);\n"
-      "  gl_FragColor = vec4(col.rgb * dim, col.a)\n;"
+      "  gl_FragColor = vec4(col.rgb * dim, col.a * alpha)\n;"
       "}\n";
 
 #define FRAGMENT_CONVERT_YUV                                        \
@@ -778,7 +783,8 @@ texture_paint(struct ctx *context, GLuint *textures, GLuint nmemb, const struct 
    if (settings->dim > 0.0f) {
       GL_CALL(gl.api.glUniform1fv(context->program->uniforms[UNIFORM_DIM], 1, &settings->dim));
    }
-
+   GL_CALL(gl.api.glUniform1fv(context->program->uniforms[UNIFORM_ALPHA], 1, &settings->alpha));
+    
    for (GLuint i = 0; i < nmemb; ++i) {
       if (!textures[i])
          break;
@@ -828,6 +834,7 @@ surface_paint(struct ctx *context, struct wlc_surface *surface, const struct wlc
    struct paint settings;
    memset(&settings, 0, sizeof(settings));
    settings.dim = 1.0f;
+   settings.alpha = 1.0f;
    settings.program = (enum program_type)surface->format;
    settings.visible = *geometry;
    surface_paint_internal(context, surface, geometry, &settings);
@@ -845,6 +852,7 @@ view_paint(struct ctx *context, struct wlc_view *view)
    struct paint settings;
    memset(&settings, 0, sizeof(settings));
    settings.dim = ((view->commit.state & WLC_BIT_ACTIVATED) || (view->type & WLC_BIT_UNMANAGED) ? 1.0f : DIM);
+   settings.alpha = (view->alpha > 0.0) ? view->alpha : 1.0f;
    settings.program = (enum program_type)surface->format;
 
    struct wlc_geometry geometry;

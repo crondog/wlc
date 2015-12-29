@@ -123,7 +123,7 @@ wlc_view_commit_state(struct wlc_view *view, struct wlc_view_state *pending, str
    const bool size_changed = (!wlc_size_equals(&pending->geometry.size, &out->geometry.size) || !wlc_size_equals(&pending->geometry.size, &surface->size));
    wlc_dlog(WLC_DBG_COMMIT, "=> pending view commit %" PRIuWLC " (%d) pending: %ux%u commited: %ux%u surface: %ux%u", convert_to_wlc_handle(view), size_changed, pending->geometry.size.w, pending->geometry.size.h, out->geometry.size.w, out->geometry.size.h, surface->size.w, surface->size.h);
 
-   if (pending->state != out->state || size_changed)
+   if (pending->state != out->state || size_changed || true)
       configure_view(view, pending->edges, &pending->geometry);
 
    *out = *pending;
@@ -345,6 +345,16 @@ wlc_view_set_mask_ptr(struct wlc_view *view, uint32_t mask)
       return;
 
    view->mask = mask;
+   wlc_view_update(view);
+}
+
+void
+wlc_view_set_alpha_ptr(struct wlc_view *view, double alpha)
+{
+   if (!view)
+      return;
+
+   view->alpha = alpha;
    wlc_view_update(view);
 }
 
@@ -571,6 +581,12 @@ wlc_view_get_type(wlc_handle view)
 {
    void *ptr = get(convert_from_wlc_handle(view, "view"), offsetof(struct wlc_view, type));
    return (ptr ? *(uint32_t*)ptr : 0);
+}
+
+WLC_API void
+wlc_view_set_alpha(wlc_handle view, double alpha)
+{
+    wlc_view_set_alpha_ptr(convert_from_wlc_handle(view, "view"), alpha);
 }
 
 WLC_API void

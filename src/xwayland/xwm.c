@@ -542,7 +542,6 @@ get_geometry(xcb_window_t window, struct wlc_geometry *out_g, uint32_t *out_dept
 
       if (out_depth)
          *out_depth = reply->depth;
-
       free(reply);
    }
 }
@@ -565,7 +564,7 @@ link_surface(struct wlc_xwm *xwm, struct wlc_x11_window *win, struct wl_resource
    uint32_t depth;
    struct wlc_geometry geometry;
    get_geometry(win->id, &geometry, &depth);
-   win->has_alpha = (depth == 32);
+   win->has_alpha = 1;//(depth == 32);
 
    // This is not real interactable x11 window most likely, lets just not handle it.
    if (win->override_redirect && geometry.size.w <= 1 && geometry.size.h <= 1) {
